@@ -1,0 +1,9 @@
+{
+    "name": "PalletizingHMI",
+    "packageName": "com.nexarobotics.palletizinghmi",
+    "version": "0.1.0",
+    "sdkVersion": "4",
+    "icon": "assets/images/icon.png",
+    "drscModulePackageFile": "drsc_com.nexarobotics.palletizinghmi.dm",
+    "drcfModulePackageFile": ""
+}

@@ -1,0 +1,20 @@
+{
+    "key": "PalletizingHMI_0.1.0_4_1763739498442",
+    "projectType": "Blank",
+    "projectGroup": null,
+    "templateInfo": {
+        "type": "Blank",
+        "title": "Blank",
+        "category": null,
+        "group": null,
+        "dartPackageInfo": {
+            "title": "",
+            "group": "",
+            "type": "",
+            "category": ""
+        }
+    },
+    "packageName": "com.nexarobotics.palletizinghmi",
+    "ideMode": "basic",
+    "UserCommand": false
+}
