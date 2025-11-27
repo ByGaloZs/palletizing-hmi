@@ -1,15 +1,137 @@
-/*
-    BSD 3-Clause License    
-    Copyright (c) 2023, Doosan Robotics Inc.
-*/
-.container-sample {
-    padding: 20px;
-    width: 100%;
-    height: 100%;
-    position: relative;
-
-    .label-sample {
-        font-size: 15px;
-    }
+.mainContainer {
+  padding: 20px;
 }
 
+.controlsRow {
+  margin-top: 12px;
+  display: flex;
+  gap: 8px;
+}
+
+.btn {
+  min-width: 80px;
+  padding: 6px 14px;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  outline: none;
+}
+
+.btnStart {
+  background-color: #4caf50;
+  color: #ffffff;
+}
+
+.btnPause {
+  background-color: #ffb300;
+  color: #ffffff;
+}
+
+.btnContinue {
+  background-color: #1976d2;
+  color: #ffffff;
+}
+
+.btnStop {
+  background-color: #e53935;
+  color: #ffffff;
+}
+
+/* sombreado / deshabilitado */
+.btnDisabled,
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn:hover:not(:disabled) {
+  filter: brightness(1.05);
+}
+
+.btn:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+/* Panel de selección de lado */
+.sidePanel {
+  margin-top: 20px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  border: 1px solid #444;
+  display: inline-block;
+}
+
+.sidePanelTitle {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.switchRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.switchLabel {
+  font-size: 13px;
+  min-width: 70px;
+}
+
+/* --- Toggle Switch Moderno --- */
+
+.toggleContainer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 8px 0;
+}
+
+.toggleLabel {
+  font-size: 14px;
+  font-weight: 500;
+  width: 80px;
+}
+
+.toggleSwitch {
+  width: 50px;
+  height: 26px;
+  border-radius: 20px;
+  position: relative;
+  cursor: pointer;
+  transition: background-color 0.25s ease;
+}
+
+.toggleCircle {
+  width: 22px;
+  height: 22px;
+  background: white;
+  border-radius: 50%;
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  transition: left 0.25s ease, box-shadow 0.25s ease;
+}
+
+/* ON */
+.on {
+  background-color: #4caf50;
+}
+
+.on .toggleCircle {
+  left: 26px;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.25);
+}
+
+/* OFF */
+.off {
+  background-color: #aaa;
+}
+
+.off .toggleCircle {
+  left: 2px;
+  box-shadow: none;
+}

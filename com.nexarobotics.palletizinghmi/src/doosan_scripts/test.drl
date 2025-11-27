@@ -1,0 +1,10 @@
+# ================================
+# Test DRL — SAFE PROGRAM
+# (No movement)
+# ================================
+
+tp_log("Test DRL iniciado");
+
+wait(5);
+
+tp_log("Test DRL finalizado");
