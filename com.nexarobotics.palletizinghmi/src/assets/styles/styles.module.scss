@@ -38,24 +38,29 @@
     opacity 0.12s ease;
 }
 
-/* START: azul primario */
+/* START*/
 .btnStart {
   background: #0B6E4F;
 }
 
-/* PAUSE / CONTINUE: azul un poco más claro */
+/* PAUSE*/
 .btnPause {
-  background: #1E3A8A;
+  background: #f8b601;
 }
 
-/* STOP: rojo, pero mismo estilo visual */
+/* CONTINUE*/
+.btnContinue {
+  background: #0f9215;
+}
+
+/* STOP*/
 .btnStop {
   background: #C62828;
 }
 
-/* GO HOME: azul brillante, misma familia */
+/* GO HOME*/
 .btnGoHome {
-  background: #f8b601;
+  background: #152aa1;
 }
 
 /* Estado deshabilitado */

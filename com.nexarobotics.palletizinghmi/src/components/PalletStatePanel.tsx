@@ -60,33 +60,122 @@ const PalletStatePanel: React.FC<PalletStatePanelProps> = ({
   rightMaxLayers,
   rightMaxSlots,
 }) => {
-  // Helpers de clamp para los inputs numéricos
+  // Helper clamp
   const clamp = (value: number, min: number, max: number) =>
     Math.min(max, Math.max(min, value));
 
+  // ---- Estados locales para inputs (texto) ----
+  const [leftLayerInput, setLeftLayerInput] = React.useState(
+    leftLayer.toString()
+  );
+  const [leftSlotInput, setLeftSlotInput] = React.useState(
+    leftSlot.toString()
+  );
+  const [rightLayerInput, setRightLayerInput] = React.useState(
+    rightLayer.toString()
+  );
+  const [rightSlotInput, setRightSlotInput] = React.useState(
+    rightSlot.toString()
+  );
+
+  // Sincronizar si el padre cambia los valores (reset, carga, etc.)
+  React.useEffect(() => {
+    setLeftLayerInput(leftLayer.toString());
+  }, [leftLayer]);
+
+  React.useEffect(() => {
+    setLeftSlotInput(leftSlot.toString());
+  }, [leftSlot]);
+
+  React.useEffect(() => {
+    setRightLayerInput(rightLayer.toString());
+  }, [rightLayer]);
+
+  React.useEffect(() => {
+    setRightSlotInput(rightSlot.toString());
+  }, [rightSlot]);
+
+  // ---- HANDLERS LEFT ----
+
   const handleLeftLayerChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = parseInt(e.target.value || "0", 10);
-    if (Number.isNaN(val)) return;
-    onChangeLeftLayer(clamp(val, 1, leftMaxLayers));
+    setLeftLayerInput(e.target.value); // sin validar aún
+  };
+
+  const handleLeftLayerBlur = () => {
+    const val = parseInt(leftLayerInput, 10);
+
+    if (Number.isNaN(val)) {
+      const fallback = 1;
+      onChangeLeftLayer(fallback);
+      setLeftLayerInput(fallback.toString());
+      return;
+    }
+
+    const cleaned = clamp(val, 1, leftMaxLayers);
+    onChangeLeftLayer(cleaned);
+    setLeftLayerInput(cleaned.toString());
   };
 
   const handleLeftSlotChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = parseInt(e.target.value || "0", 10);
-    if (Number.isNaN(val)) return;
-    onChangeLeftSlot(clamp(val, 1, leftMaxSlots));
+    setLeftSlotInput(e.target.value);
   };
 
+  const handleLeftSlotBlur = () => {
+    const val = parseInt(leftSlotInput, 10);
+
+    if (Number.isNaN(val)) {
+      const fallback = 1;
+      onChangeLeftSlot(fallback);
+      setLeftSlotInput(fallback.toString());
+      return;
+    }
+
+    const cleaned = clamp(val, 1, leftMaxSlots);
+    onChangeLeftSlot(cleaned);
+    setLeftSlotInput(cleaned.toString());
+  };
+
+  // ---- HANDLERS RIGHT ----
+
   const handleRightLayerChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = parseInt(e.target.value || "0", 10);
-    if (Number.isNaN(val)) return;
-    onChangeRightLayer(clamp(val, 1, rightMaxLayers));
+    setRightLayerInput(e.target.value);
+  };
+
+  const handleRightLayerBlur = () => {
+    const val = parseInt(rightLayerInput, 10);
+
+    if (Number.isNaN(val)) {
+      const fallback = 1;
+      onChangeRightLayer(fallback);
+      setRightLayerInput(fallback.toString());
+      return;
+    }
+
+    const cleaned = clamp(val, 1, rightMaxLayers);
+    onChangeRightLayer(cleaned);
+    setRightLayerInput(cleaned.toString());
   };
 
   const handleRightSlotChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = parseInt(e.target.value || "0", 10);
-    if (Number.isNaN(val)) return;
-    onChangeRightSlot(clamp(val, 1, rightMaxSlots));
+    setRightSlotInput(e.target.value);
   };
+
+  const handleRightSlotBlur = () => {
+    const val = parseInt(rightSlotInput, 10);
+
+    if (Number.isNaN(val)) {
+      const fallback = 1;
+      onChangeRightSlot(fallback);
+      setRightSlotInput(fallback.toString());
+      return;
+    }
+
+    const cleaned = clamp(val, 1, rightMaxSlots);
+    onChangeRightSlot(cleaned);
+    setRightSlotInput(cleaned.toString());
+  };
+
+  // ---- Toggles ----
 
   const handleToggleLeft = () => {
     if (configDisabled) return;
@@ -139,11 +228,12 @@ const PalletStatePanel: React.FC<PalletStatePanelProps> = ({
             <input
               type="number"
               className={styles.palletNumberInput}
-              value={leftLayer}
+              value={leftLayerInput}
+              onChange={handleLeftLayerChange}
+              onBlur={handleLeftLayerBlur}
+              disabled={!leftEnabled || configDisabled}
               min={1}
               max={leftMaxLayers}
-              onChange={handleLeftLayerChange}
-              disabled={!leftEnabled || configDisabled}
             />
             <span className={styles.palletFieldMax}>/ {leftMaxLayers}</span>
           </div>
@@ -154,11 +244,12 @@ const PalletStatePanel: React.FC<PalletStatePanelProps> = ({
             <input
               type="number"
               className={styles.palletNumberInput}
-              value={leftSlot}
+              value={leftSlotInput}
+              onChange={handleLeftSlotChange}
+              onBlur={handleLeftSlotBlur}
+              disabled={!leftEnabled || configDisabled}
               min={1}
               max={leftMaxSlots}
-              onChange={handleLeftSlotChange}
-              disabled={!leftEnabled || configDisabled}
             />
             <span className={styles.palletFieldMax}>/ {leftMaxSlots}</span>
           </div>
@@ -199,7 +290,9 @@ const PalletStatePanel: React.FC<PalletStatePanelProps> = ({
           {/* Pastilla de estado (LED cápsula) */}
           <div
             className={`${styles.palletStatePill} ${
-              rightPalletDetected ? styles.palletStateOn : styles.palletStateOff
+              rightPalletDetected
+                ? styles.palletStateOn
+                : styles.palletStateOff
             }`}
           >
             {rightPalletDetected ? "Pallet detected" : "No pallet detected"}
@@ -211,11 +304,12 @@ const PalletStatePanel: React.FC<PalletStatePanelProps> = ({
             <input
               type="number"
               className={styles.palletNumberInput}
-              value={rightLayer}
+              value={rightLayerInput}
+              onChange={handleRightLayerChange}
+              onBlur={handleRightLayerBlur}
+              disabled={!rightEnabled || configDisabled}
               min={1}
               max={rightMaxLayers}
-              onChange={handleRightLayerChange}
-              disabled={!rightEnabled || configDisabled}
             />
             <span className={styles.palletFieldMax}>/ {rightMaxLayers}</span>
           </div>
@@ -226,11 +320,12 @@ const PalletStatePanel: React.FC<PalletStatePanelProps> = ({
             <input
               type="number"
               className={styles.palletNumberInput}
-              value={rightSlot}
+              value={rightSlotInput}
+              onChange={handleRightSlotChange}
+              onBlur={handleRightSlotBlur}
+              disabled={!rightEnabled || configDisabled}
               min={1}
               max={rightMaxSlots}
-              onChange={handleRightSlotChange}
-              disabled={!rightEnabled || configDisabled}
             />
             <span className={styles.palletFieldMax}>/ {rightMaxSlots}</span>
           </div>

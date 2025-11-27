@@ -43,7 +43,7 @@ const ControlButtons: React.FC<Props> = ({
       {/* PAUSE / CONTINUE */}
       {isPaused ? (
         <button
-          className={`${styles.btn} ${styles.btnPause} ${
+          className={`${styles.btn} ${styles.btnContinue} ${
             isPauseDisabled ? styles.btnDisabled : ""
           }`}
           onClick={onContinue}
