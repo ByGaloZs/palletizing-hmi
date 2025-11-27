@@ -1,87 +1,86 @@
 .mainContainer {
   padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
+/* =======================
+   BOTONES DE CONTROL
+   ======================= */
+
 .controlsRow {
-  margin-top: 12px;
   display: flex;
-  gap: 8px;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  padding: 16px 0;
 }
 
 .btn {
-  min-width: 80px;
-  padding: 6px 14px;
+  position: relative;
+  min-width: 150px;
+  height: 50px;
+  padding: 0 22px;
+  border-radius: 999px;
   border: none;
-  border-radius: 4px;
   font-size: 14px;
   font-weight: 600;
+  letter-spacing: 0.02em;
   cursor: pointer;
   outline: none;
+  color: #ffffff;
+  box-shadow: 0 8px 16px rgba(10, 32, 115, 0.18);
+  transition:
+    background-color 0.18s ease,
+    box-shadow 0.18s ease,
+    transform 0.1s ease,
+    opacity 0.12s ease;
 }
 
+/* START: azul primario */
 .btnStart {
-  background-color: #4caf50;
-  color: #ffffff;
+  background: #0B6E4F;
 }
 
+/* PAUSE / CONTINUE: azul un poco más claro */
 .btnPause {
-  background-color: #ffb300;
-  color: #ffffff;
+  background: #1E3A8A;
 }
 
-.btnContinue {
-  background-color: #1976d2;
-  color: #ffffff;
-}
-
+/* STOP: rojo, pero mismo estilo visual */
 .btnStop {
-  background-color: #e53935;
-  color: #ffffff;
+  background: #C62828;
 }
 
-/* sombreado / deshabilitado */
+/* GO HOME: azul brillante, misma familia */
+.btnGoHome {
+  background: #f8b601;
+}
+
+/* Estado deshabilitado */
 .btnDisabled,
 .btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+  box-shadow: none;
 }
 
-.btn:hover:not(:disabled) {
-  filter: brightness(1.05);
+/* Hover y active (solo cuando no están deshabilitados) */
+.btn:not(:disabled):hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 22px rgba(10, 32, 115, 0.25);
 }
 
-.btn:active:not(:disabled) {
-  transform: translateY(1px);
+.btn:not(:disabled):active {
+  transform: translateY(0);
+  box-shadow: 0 7px 14px rgba(10, 32, 115, 0.18);
 }
 
-/* Panel de selección de lado */
-.sidePanel {
-  margin-top: 20px;
-  padding: 12px 16px;
-  border-radius: 8px;
-  border: 1px solid #444;
-  display: inline-block;
-}
 
-.sidePanelTitle {
-  font-size: 14px;
-  font-weight: 600;
-  margin-bottom: 8px;
-}
-
-.switchRow {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 6px;
-}
-
-.switchLabel {
-  font-size: 13px;
-  min-width: 70px;
-}
-
-/* --- Toggle Switch Moderno --- */
+/* =======================
+   TOGGLE SWITCH
+   ======================= */
 
 .toggleContainer {
   display: flex;
@@ -128,10 +127,175 @@
 
 /* OFF */
 .off {
-  background-color: #aaa;
+  background-color: #aaaaaa;
 }
 
 .off .toggleCircle {
   left: 2px;
   box-shadow: none;
+}
+
+/* Toggle disabled */
+.toggleContainerDisabled {
+  opacity: 0.6;
+}
+
+.toggleSwitchDisabled {
+  cursor: not-allowed;
+}
+
+
+/* =======================
+   CARDS (Pallet + Control)
+   ======================= */
+
+.palletCard,
+.controlCard {
+  background: #f5f7ff;
+  border-radius: 16px;
+  box-shadow: 0 8px 18px rgba(10, 32, 115, 0.12);
+  min-width: 480px;
+}
+
+.palletCardHeader,
+.controlCardHeader {
+  background: #16205c;
+  color: #ffffff;
+  border-radius: 16px 16px 0 0;
+  font-size: 15px;
+  font-weight: 600;
+  padding: 10px 16px;
+}
+
+.palletCardBody {
+  display: flex;
+  flex-direction: row;
+  gap: 24px;
+  padding: 20px 24px;
+  align-items: flex-start;
+  flex-wrap: nowrap;   
+}
+
+.controlCardBody {
+  padding: 20px 24px;
+}
+
+.palletSide {
+  flex: 1;
+  padding: 0 8px;
+  min-width: 260px;    
+}
+
+.palletDivider {
+  width: 1px;
+  background: #dddddd;
+  align-self: stretch;
+  margin: 0 4px;
+}
+
+.palletSideHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.palletSideTitle {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.palletStatusMissing {
+  font-size: 12px;
+  background: #ffd6d6;
+  color: #b00020;
+  padding: 4px 8px;
+  border-radius: 4px;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.palletStatusDetected {
+  font-size: 12px;
+  background: #d4f8d4;
+  color: #1b5e20;
+  padding: 4px 8px;
+  border-radius: 4px;
+  margin-bottom: 10px;
+  text-align: center;
+  font-weight: 600;
+}
+
+.palletFieldRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.palletFieldLabel {
+  font-size: 13px;
+  min-width: 48px;
+}
+
+.palletNumberInput {
+  width: 60px;
+  padding: 4px 6px;
+  border-radius: 4px;
+  border: 1px solid #cccccc;
+  font-size: 13px;
+}
+
+.palletFieldMax {
+  font-size: 12px;
+  color: #666666;
+}
+
+.palletResetBtn {
+  margin-top: 10px;
+  width: 100%;
+  padding: 6px 0;
+  border-radius: 6px;
+  border: 1px solid #444444;
+  background: #ffffff;
+  cursor: pointer;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.palletResetBtn:hover:not(:disabled) {
+  background: #f3f3f3;
+}
+
+/* Botón Reset disabled */
+.palletResetBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.palletStatePill {
+  width: 100%;
+  padding: 8px 0;
+  border-radius: 999px;
+  text-align: center;
+  font-size: 16px;
+  font-weight: 600;
+  margin: 8px 0 14px 0;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.12);
+  transition: all 0.2s ease;
+}
+
+/* Rojo – NO pallet */
+.palletStateOff {
+  background: #ffd0d0;
+  color: #b30000;
+}
+
+/* Verde – pallet detected */
+.palletStateOn {
+  background: #16a34a;
+  color: white;
 }

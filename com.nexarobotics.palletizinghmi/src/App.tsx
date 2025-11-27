@@ -6,7 +6,7 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 
-// Importes del API oficial de DART v4
+// API DART v4
 import {
   ModuleContext,
   Context,
@@ -19,12 +19,10 @@ import styles from "./assets/styles/styles.module.scss";
 
 // Componentes propios
 import ControlButtons from "./components/ControlButtons";
-import SideSwitches from "./components/SideSwitches";
+import PalletStatePanel from "./components/PalletStatePanel";
 
-// Utilidad para correr DRL
+// Utilidad DRL
 import DrlUtils from "./DrlUtils";
-
-// Importa tu script DRL
 import testDrl from "./doosan_scripts/test.drl";
 
 interface IAppProps {
@@ -33,65 +31,91 @@ interface IAppProps {
 
 function App(props: IAppProps) {
   const { moduleContext } = props;
-
-  // Traducción (por si luego agregas textos)
   const { t } = useTranslation(moduleContext.packageName);
 
   const drlUtils = React.useMemo(() => DrlUtils.getInstance(), []);
-
   const programManager = React.useMemo(
     () =>
       moduleContext.getSystemManager(Context.PROGRAM_MANAGER) as IProgramManager,
     [moduleContext]
   );
 
-  // Estado para el botón Pause/Continue
+  // Máximos de pallet
+  const MAX_LAYERS = 9;
+  const MAX_SLOTS = 9;
+
+  // Estados
   const [isPaused, setIsPaused] = React.useState(false);
+  const [isStarted, setIsStarted] = React.useState(false);
 
-  // Estado para bloquear el botón Start
-  const [isStartDisabled, setIsStartDisabled] = React.useState(false);
-
-  // Estado de selectores de lado
   const [leftEnabled, setLeftEnabled] = React.useState(true);
   const [rightEnabled, setRightEnabled] = React.useState(false);
+
+  const [leftLayer, setLeftLayer] = React.useState<number>(1);
+  const [leftSlot, setLeftSlot] = React.useState<number>(1);
+  const [rightLayer, setRightLayer] = React.useState<number>(1);
+  const [rightSlot, setRightSlot] = React.useState<number>(1);
+
+  const [leftPalletDetected, setLeftPalletDetected] =
+    React.useState<boolean>(false);
+  const [rightPalletDetected, setRightPalletDetected] =
+    React.useState<boolean>(false);
+
+  // ---------------------------
+  // CÁLCULO DE CONFIGURACIÓN
+  // ---------------------------
+
+  let selectedSide: "none" | "left" | "right" | "both" = "none";
+  let selectedLayer = 0;
+  let selectedSlot = 0;
+
+  if (leftEnabled && rightEnabled) {
+    selectedSide = "both";
+    selectedLayer = leftLayer;
+    selectedSlot = leftSlot;
+  } else if (leftEnabled) {
+    selectedSide = "left";
+    selectedLayer = leftLayer;
+    selectedSlot = leftSlot;
+  } else if (rightEnabled) {
+    selectedSide = "right";
+    selectedLayer = rightLayer;
+    selectedSlot = rightSlot;
+  }
+
+  const configIsValid =
+    selectedSide !== "none" && selectedLayer >= 1 && selectedSlot >= 1;
+
+  // ---------------------------
+  // HABILITACIÓN DE BOTONES
+  // ---------------------------
+
+  const isStartDisabled = !configIsValid || isStarted;
+  const isPauseDisabled = !isStarted || !configIsValid;
+  const isStopDisabled = !isStarted || !configIsValid;
+  const isGoHomeDisabled = isStarted; // ⬅ NUEVO
 
   // ============================
   // HANDLERS
   // ============================
 
-  // START
   const handleStart = () => {
+    if (isStartDisabled) return;
+
     try {
-      // Determinar lado lógico según switches
-      let side: string;
-
-      if (leftEnabled && rightEnabled) {
-        side = "both";
-      } else if (leftEnabled && !rightEnabled) {
-        side = "left";
-      } else if (!leftEnabled && rightEnabled) {
-        side = "right";
-      } else {
-        // Ninguno seleccionado: podrías bloquear el start o usar un valor por defecto
-        side = "none";
-      }
-
-      console.log("Lado seleccionado:", side);
-
-      // Aquí, en el futuro, puedes mandar 'side' como parámetro al DRL
-      // ej: drlUtils.runProgram(moduleContext, testDrl, [{ name: "side", value: side }], null, false);
-
+      console.log("Iniciar palletizing:", selectedSide);
       drlUtils.runProgram(moduleContext, testDrl, [], null, false);
 
       setIsPaused(false);
-      setIsStartDisabled(true);
+      setIsStarted(true); // Bloquea todo
     } catch (e) {
-      console.error("Error al iniciar DRL:", e);
+      console.error("Error al iniciar:", e);
     }
   };
 
-  // PAUSE
   const handlePause = async () => {
+    if (isPauseDisabled) return;
+
     try {
       await programManager.pauseProgram();
       setIsPaused(true);
@@ -100,8 +124,9 @@ function App(props: IAppProps) {
     }
   };
 
-  // CONTINUE
   const handleContinue = async () => {
+    if (isPauseDisabled) return;
+
     try {
       await programManager.resumeProgram();
       setIsPaused(false);
@@ -110,15 +135,33 @@ function App(props: IAppProps) {
     }
   };
 
-  // STOP
   const handleStop = async () => {
+    if (isStopDisabled) return;
+
     try {
       await programManager.stopProgram(ProgramStopType.QUICK);
       setIsPaused(false);
-      setIsStartDisabled(false);
+      setIsStarted(false); // Desbloquea configuración
     } catch (e) {
       console.error("Error al detener:", e);
     }
+  };
+
+  const handleGoHome = () => {
+    if (isGoHomeDisabled) return;
+    console.log("GO HOME ejecutado");
+  };
+
+  const handleResetLeft = () => {
+    if (isStarted) return;
+    setLeftLayer(1);
+    setLeftSlot(1);
+  };
+
+  const handleResetRight = () => {
+    if (isStarted) return;
+    setRightLayer(1);
+    setRightSlot(1);
   };
 
   // ============================
@@ -127,21 +170,47 @@ function App(props: IAppProps) {
 
   return (
     <div className={styles.mainContainer}>
-      <ControlButtons
-        onStart={handleStart}
-        onPause={handlePause}
-        onContinue={handleContinue}
-        onStop={handleStop}
-        isPaused={isPaused}
-        isStartDisabled={isStartDisabled}
-      />
-
-      <SideSwitches
+      <PalletStatePanel
         leftEnabled={leftEnabled}
         rightEnabled={rightEnabled}
-        onChangeLeft={setLeftEnabled}
-        onChangeRight={setRightEnabled}
+        onChangeLeftEnabled={setLeftEnabled}
+        onChangeRightEnabled={setRightEnabled}
+        leftLayer={leftLayer}
+        leftSlot={leftSlot}
+        rightLayer={rightLayer}
+        rightSlot={rightSlot}
+        onChangeLeftLayer={setLeftLayer}
+        onChangeLeftSlot={setLeftSlot}
+        onChangeRightLayer={setRightLayer}
+        onChangeRightSlot={setRightSlot}
+        onResetLeft={handleResetLeft}
+        onResetRight={handleResetRight}
+        leftPalletDetected={leftPalletDetected}
+        rightPalletDetected={rightPalletDetected}
+        configDisabled={isStarted} 
+        leftMaxLayers={MAX_LAYERS}
+        leftMaxSlots={MAX_SLOTS}
+        rightMaxLayers={MAX_LAYERS}
+        rightMaxSlots={MAX_SLOTS}
       />
+
+      <div className={styles.controlCard}>
+        <div className={styles.controlCardHeader}>Palletizing control</div>
+        <div className={styles.controlCardBody}>
+          <ControlButtons
+            onStart={handleStart}
+            onPause={handlePause}
+            onContinue={handleContinue}
+            onStop={handleStop}
+            onGoHome={handleGoHome}
+            isPaused={isPaused}
+            isStartDisabled={isStartDisabled}
+            isPauseDisabled={isPauseDisabled}
+            isStopDisabled={isStopDisabled}
+            isGoHomeDisabled={isGoHomeDisabled} // ⬅ NUEVO
+          />
+        </div>
+      </div>
     </div>
   );
 }
