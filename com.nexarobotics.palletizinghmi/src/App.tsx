@@ -1,8 +1,3 @@
-/*
-    BSD 3-Clause License    
-    Copyright (c) 2023, Doosan Robotics Inc.
-*/
-
 import React from "react";
 import { useTranslation } from "react-i18next";
 
@@ -24,6 +19,7 @@ import PalletStatePanel from "./components/PalletStatePanel";
 // Utilidad DRL
 import DrlUtils from "./DrlUtils";
 import testDrl from "./doosan_scripts/test.drl";
+import setPalletsConfig from "./doosan_scripts/set_pallets_config.drl";
 
 interface IAppProps {
   moduleContext: ModuleContext;
@@ -93,7 +89,10 @@ function App(props: IAppProps) {
   const isStartDisabled = !configIsValid || isStarted;
   const isPauseDisabled = !isStarted || !configIsValid;
   const isStopDisabled = !isStarted || !configIsValid;
-  const isGoHomeDisabled = isStarted; // ⬅ NUEVO
+  const isGoHomeDisabled = isStarted;
+
+  // El SET debe poder usarse con el robot parado y config válida
+  const isSetConfigDisabled = !configIsValid || isStarted;
 
   // ============================
   // HANDLERS
@@ -164,6 +163,49 @@ function App(props: IAppProps) {
     setRightSlot(1);
   };
 
+const handleSetConfigToPLC = () => {
+  if (isSetConfigDisabled) return;
+
+  // 0 = left, 1 = right, 2 = both
+  const sideCode =
+    selectedSide === "left"
+      ? 0
+      : selectedSide === "right"
+      ? 1
+      : selectedSide === "both"
+      ? 2
+      : -1;
+
+  if (sideCode < 0) {
+    console.warn("SET CONFIG → Config inválida (sideCode < 0)");
+    return;
+  }
+
+  const leftEnabledInt = leftEnabled ? 1 : 0;
+  const rightEnabledInt = rightEnabled ? 1 : 0;
+  const numericArgs = [
+    sideCode,
+    leftEnabledInt,
+    leftLayer,
+    leftSlot,
+    rightEnabledInt,
+    rightLayer,
+    rightSlot,
+  ];
+
+  // DART espera strings, luego el DRL los castea a int
+  const args: string[] = numericArgs.map((v) => v.toString());
+
+  console.log("[HMI] SET CONFIG → args enviados al DRL:", args);
+
+  try {
+    drlUtils.runProgram(moduleContext, setPalletsConfig, args, null, false);
+  } catch (err) {
+    console.error("Error al mandar config al PLC:", err);
+  }
+
+};
+
   // ============================
   // RENDER
   // ============================
@@ -187,11 +229,14 @@ function App(props: IAppProps) {
         onResetRight={handleResetRight}
         leftPalletDetected={leftPalletDetected}
         rightPalletDetected={rightPalletDetected}
-        configDisabled={isStarted} 
+        configDisabled={isStarted}
         leftMaxLayers={MAX_LAYERS}
         leftMaxSlots={MAX_SLOTS}
         rightMaxLayers={MAX_LAYERS}
         rightMaxSlots={MAX_SLOTS}
+        // Props nuevos para el botón SET (opción A)
+        onSetConfig={handleSetConfigToPLC}
+        isSetDisabled={isSetConfigDisabled}
       />
 
       <div className={styles.controlCard}>
@@ -207,7 +252,7 @@ function App(props: IAppProps) {
             isStartDisabled={isStartDisabled}
             isPauseDisabled={isPauseDisabled}
             isStopDisabled={isStopDisabled}
-            isGoHomeDisabled={isGoHomeDisabled} // ⬅ NUEVO
+            isGoHomeDisabled={isGoHomeDisabled}
           />
         </div>
       </div>

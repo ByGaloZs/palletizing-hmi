@@ -304,3 +304,32 @@
   background: #16a34a;
   color: white;
 }
+
+.palletCardFooter {
+  padding: 8px 16px 14px 16px;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  display: flex;
+  justify-content: center;
+}
+.palletSetBtn {
+  padding: 18px 20px;
+  border-radius: 20px;
+  border: none;
+  background: #16205c;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  min-width: 130px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.palletSetBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.palletSetBtn:hover:not(:disabled) {
+  background: #1f2b80;
+}

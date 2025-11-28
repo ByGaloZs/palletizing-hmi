@@ -35,6 +35,10 @@ interface PalletStatePanelProps {
   leftMaxSlots: number;
   rightMaxLayers: number;
   rightMaxSlots: number;
+
+  // NUEVO: botón SET general (opción A)
+  onSetConfig: () => void;
+  isSetDisabled: boolean;
 }
 
 const PalletStatePanel: React.FC<PalletStatePanelProps> = ({
@@ -59,6 +63,8 @@ const PalletStatePanel: React.FC<PalletStatePanelProps> = ({
   leftMaxSlots,
   rightMaxLayers,
   rightMaxSlots,
+  onSetConfig,
+  isSetDisabled,
 }) => {
   // Helper clamp
   const clamp = (value: number, min: number, max: number) =>
@@ -338,6 +344,16 @@ const PalletStatePanel: React.FC<PalletStatePanelProps> = ({
             ⟳ Reset
           </button>
         </div>
+      </div>
+
+      {/* Footer con botón SET (opción A) */}
+      <div className={styles.palletCardFooter}>
+        <button 
+          className={styles.palletSetBtn}
+          onClick={onSetConfig}
+          disabled={isSetDisabled}>
+          Set config to PLC
+        </button>
       </div>
     </div>
   );
