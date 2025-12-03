@@ -3,9 +3,9 @@
     "version": "4.0.0",
     "description": "Doosan Robotics's SW Platform API",
     "author": {
-        "name": "Doosan Robotics",
-        "email": "person.equals.future@doosan.com",
-        "url": "https://www.doosanrobotics.com"
+        "name": "Mario Padilla",
+        "email": "mario-franco97@hotmail.com",
+        "url": "https://github.com/ByGaloZs"
     },
     "files": [
         "dart-api.ts",
