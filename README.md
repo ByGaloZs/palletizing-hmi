@@ -17,10 +17,10 @@ The module allows:
 
 # System Architecture
 
-[HMI React (DART Module)]
-↓ IndustrialEthernet (PROFINET)
-[Siemens S7-1200 PLC]
-↓ GPR I/O Mapping
+[HMI React (DART Module)]<br>
+↓ IndustrialEthernet (PROFINET)<br>
+[Siemens S7-1200 PLC]<br>
+↓ GPR I/O Mapping<br>
 [Doosan Robot Controller]
 
 
