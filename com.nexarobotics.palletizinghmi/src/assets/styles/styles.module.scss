@@ -8,6 +8,14 @@
 /* =======================
    BOTONES DE CONTROL
    ======================= */
+.controlButtonsContainer {
+  display: flex;
+  justify-content: center;   
+  align-items: center;       
+  gap: 20px;                 
+  margin-top: 10px;
+  flex-wrap: nowrap;      
+}
 
 .controlsRow {
   display: flex;

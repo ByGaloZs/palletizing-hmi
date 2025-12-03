@@ -12,7 +12,7 @@ interface Props {
   isStartDisabled: boolean;
   isPauseDisabled: boolean;
   isStopDisabled: boolean;
-  isGoHomeDisabled: boolean; // ⬅ NUEVO
+  isGoHomeDisabled: boolean;
 }
 
 const ControlButtons: React.FC<Props> = ({
@@ -28,7 +28,8 @@ const ControlButtons: React.FC<Props> = ({
   isGoHomeDisabled,
 }) => {
   return (
-    <div className={styles.controlsRow}>
+    <div className={styles.controlButtonsContainer}>
+
       {/* START */}
       <button
         className={`${styles.btn} ${styles.btnStart} ${
@@ -40,18 +41,8 @@ const ControlButtons: React.FC<Props> = ({
         Start
       </button>
 
-      {/* PAUSE / CONTINUE */}
-      {isPaused ? (
-        <button
-          className={`${styles.btn} ${styles.btnContinue} ${
-            isPauseDisabled ? styles.btnDisabled : ""
-          }`}
-          onClick={onContinue}
-          disabled={isPauseDisabled}
-        >
-          Continue
-        </button>
-      ) : (
+      {/* PAUSE or CONTINUE (se reemplazan uno al otro) */}
+      {!isPaused ? (
         <button
           className={`${styles.btn} ${styles.btnPause} ${
             isPauseDisabled ? styles.btnDisabled : ""
@@ -60,6 +51,13 @@ const ControlButtons: React.FC<Props> = ({
           disabled={isPauseDisabled}
         >
           Pause
+        </button>
+      ) : (
+        <button
+          className={`${styles.btn} ${styles.btnContinue}`}
+          onClick={onContinue}
+        >
+          Continue
         </button>
       )}
 

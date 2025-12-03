@@ -36,9 +36,11 @@ interface PalletStatePanelProps {
   rightMaxLayers: number;
   rightMaxSlots: number;
 
-  // NUEVO: botón SET general (opción A)
+
   onSetConfig: () => void;
   isSetDisabled: boolean;
+  
+  lockInputs: boolean;
 }
 
 const PalletStatePanel: React.FC<PalletStatePanelProps> = ({
@@ -65,6 +67,7 @@ const PalletStatePanel: React.FC<PalletStatePanelProps> = ({
   rightMaxSlots,
   onSetConfig,
   isSetDisabled,
+  lockInputs,
 }) => {
   // Helper clamp
   const clamp = (value: number, min: number, max: number) =>
@@ -237,7 +240,7 @@ const PalletStatePanel: React.FC<PalletStatePanelProps> = ({
               value={leftLayerInput}
               onChange={handleLeftLayerChange}
               onBlur={handleLeftLayerBlur}
-              disabled={!leftEnabled || configDisabled}
+              disabled={configDisabled || lockInputs || !leftEnabled}
               min={1}
               max={leftMaxLayers}
             />
@@ -253,7 +256,7 @@ const PalletStatePanel: React.FC<PalletStatePanelProps> = ({
               value={leftSlotInput}
               onChange={handleLeftSlotChange}
               onBlur={handleLeftSlotBlur}
-              disabled={!leftEnabled || configDisabled}
+              disabled={configDisabled || lockInputs || !leftEnabled}
               min={1}
               max={leftMaxSlots}
             />
@@ -313,7 +316,7 @@ const PalletStatePanel: React.FC<PalletStatePanelProps> = ({
               value={rightLayerInput}
               onChange={handleRightLayerChange}
               onBlur={handleRightLayerBlur}
-              disabled={!rightEnabled || configDisabled}
+              disabled={configDisabled || lockInputs || !rightEnabled}
               min={1}
               max={rightMaxLayers}
             />
@@ -329,7 +332,7 @@ const PalletStatePanel: React.FC<PalletStatePanelProps> = ({
               value={rightSlotInput}
               onChange={handleRightSlotChange}
               onBlur={handleRightSlotBlur}
-              disabled={!rightEnabled || configDisabled}
+              disabled={configDisabled || lockInputs || !rightEnabled}
               min={1}
               max={rightMaxSlots}
             />
