@@ -26,10 +26,9 @@ import testDrl from "./doosan_scripts/test.drl";
 // ==== MAPA DE GPR  ====
 
 // ---- BOOL GPR (ENTRADA DESDE PLC → HMI) ----
-// Presencia de pallets (bits 0 y 1 del PLC)
+// Presencia de pallets (bits 8 y 9 del PLC)
 const GPR_IN_BOOL_LEFT_PALLET_PRESENT = 8;
 const GPR_IN_BOOL_RIGHT_PALLET_PRESENT = 9;
-
 
 // ---- BOOL GPR (salidas hacia PLC) ----
 const GPR_BOOL_LEFT_ENABLED = 0;
@@ -91,58 +90,67 @@ function App(props: IAppProps) {
     setIndustrialEthernet(comm.industrialEthernet);
   }, [moduleContext]);
 
+  // ============================
+  // Lectura periódica PLC → HMI (presencia pallets)
+  // ============================
+
   React.useEffect(() => {
-  if (!industrialEthernet) return;
+    if (!industrialEthernet) return;
 
-  let cancelled = false;
+    let cancelled = false;
 
-  const intervalId = setInterval(async () => {
-    try {
-      // Leer bits de presencia desde el PLC (INPUT, portType = 0)
-      const leftData = await industrialEthernet.getInputRegister(
-        IEGprDataType.BIT,
-        GPR_IN_BOOL_LEFT_PALLET_PRESENT,
-        0 // 0: IN, 1: OUT
-      );
+    const intervalId = setInterval(async () => {
+      try {
+        // Leer bits de presencia desde el PLC (INPUT, portType = 0)
+        const leftData = await industrialEthernet.getInputRegister(
+          IEGprDataType.BIT,
+          GPR_IN_BOOL_LEFT_PALLET_PRESENT,
+          0 // 0: IN
+        );
 
-      const rightData = await industrialEthernet.getInputRegister(
-        IEGprDataType.BIT,
-        GPR_IN_BOOL_RIGHT_PALLET_PRESENT,
-        0 // 0: IN, 1: OUT
-      );
+        const rightData = await industrialEthernet.getInputRegister(
+          IEGprDataType.BIT,
+          GPR_IN_BOOL_RIGHT_PALLET_PRESENT,
+          0 // 0: IN
+        );
 
-      if (cancelled) return;
+        if (cancelled) return;
 
-      const leftVal = leftData.data;
-      const rightVal = rightData.data;
+        const leftVal = leftData.data;
+        const rightVal = rightData.data;
 
-      const leftDetected =
-        leftVal === "1" || leftVal === "true" || leftVal === "ON";
-      const rightDetected =
-        rightVal === "1" || rightVal === "true" || rightVal === "ON";
+        const leftDetected =
+          leftVal === "1" || leftVal === "true" || leftVal === "ON";
+        const rightDetected =
+          rightVal === "1" || rightVal === "true" || rightVal === "ON";
 
-      setLeftPalletDetected(leftDetected);
-      setRightPalletDetected(rightDetected);
-    } catch (err) {
-      console.error(
-        "[HMI] Error leyendo presencia de pallets desde PLC:",
-        err
-      );
-    }
-  }, 300); // cada 300 ms aprox.
+        setLeftPalletDetected(leftDetected);
+        setRightPalletDetected(rightDetected);
+      } catch (err) {
+        console.error(
+          "[HMI] Error leyendo presencia de pallets desde PLC:",
+          err
+        );
+      }
+    }, 300); // cada 300 ms aprox.
 
-  return () => {
-    cancelled = true;
-    clearInterval(intervalId);
-  };
-}, [industrialEthernet]);
+    return () => {
+      cancelled = true;
+      clearInterval(intervalId);
+    };
+  }, [industrialEthernet]);
 
-
+  // ============================
   // Máximos de pallet
+  // ============================
+
   const MAX_LAYERS = 9;
   const MAX_SLOTS = 9;
 
-  // Estados
+  // ============================
+  // Estados principales
+  // ============================
+
   const [isPaused, setIsPaused] = React.useState(false);
   const [isStarted, setIsStarted] = React.useState(false);
 
@@ -158,9 +166,22 @@ function App(props: IAppProps) {
     React.useState<boolean>(false);
   const [rightPalletDetected, setRightPalletDetected] =
     React.useState<boolean>(false);
-  const [configSentToPLC, setConfigSentToPLC] = 
+
+  const [configSentToPLC, setConfigSentToPLC] =
     React.useState(false);
 
+  // ============================
+  // Logs HMI
+  // ============================
+
+  const [logs, setLogs] = React.useState<string[]>([]);
+
+  const pushLog = React.useCallback((msg: string) => {
+    const now = new Date();
+    const time = now.toLocaleTimeString();
+    const line = `[${time}] ${msg}`;
+    setLogs((prev) => [line, ...prev].slice(0, 80));
+  }, []);
 
   // ---------------------------
   // CÁLCULO DE CONFIGURACIÓN
@@ -194,7 +215,6 @@ function App(props: IAppProps) {
     leftSideOk &&
     rightSideOk;
 
-
   // ---------------------------
   // HABILITACIÓN DE BOTONES
   // ---------------------------
@@ -207,7 +227,6 @@ function App(props: IAppProps) {
   const isSetConfigDisabled =
     !configIsValid || isStarted || configSentToPLC;
 
-
   // ============================
   // HANDLERS
   // ============================
@@ -216,13 +235,15 @@ function App(props: IAppProps) {
     if (isStartDisabled) return;
 
     try {
-      console.log("Iniciar palletizing:", selectedSide);
+      pushLog(
+        `START → side=${selectedSide}, layer=${selectedLayer}, slot=${selectedSlot}`
+      );
       drlUtils.runProgram(moduleContext, testDrl, [], null, false);
-
       setIsPaused(false);
       setIsStarted(true); // Bloquea todo
     } catch (e) {
       console.error("Error al iniciar:", e);
+      pushLog(`ERROR al iniciar: ${String(e)}`);
     }
   };
 
@@ -232,8 +253,10 @@ function App(props: IAppProps) {
     try {
       await programManager.pauseProgram();
       setIsPaused(true);
+      pushLog("PAUSE enviado al robot");
     } catch (e) {
       console.error("Error al pausar:", e);
+      pushLog(`ERROR al pausar: ${String(e)}`);
     }
   };
 
@@ -243,8 +266,10 @@ function App(props: IAppProps) {
     try {
       await programManager.resumeProgram();
       setIsPaused(false);
+      pushLog("CONTINUE enviado al robot");
     } catch (e) {
       console.error("Error al continuar:", e);
+      pushLog(`ERROR al continuar: ${String(e)}`);
     }
   };
 
@@ -255,14 +280,17 @@ function App(props: IAppProps) {
       await programManager.stopProgram(ProgramStopType.QUICK);
       setIsPaused(false);
       setIsStarted(false); // Desbloquea configuración
+      pushLog("STOP rápido enviado al robot");
     } catch (e) {
       console.error("Error al detener:", e);
+      pushLog(`ERROR al detener: ${String(e)}`);
     }
   };
 
   const handleGoHome = () => {
     if (isGoHomeDisabled) return;
     console.log("GO HOME ejecutado");
+    pushLog("GO HOME presionado");
     // Aquí en futuro puedes llamar a un DRL de homing o similar
   };
 
@@ -270,46 +298,47 @@ function App(props: IAppProps) {
     if (isStarted) return;
     setLeftLayer(1);
     setLeftSlot(1);
-    setConfigSentToPLC(false);  
+    setConfigSentToPLC(false);
+    pushLog("Reset LEFT ejecutado");
   };
 
   const handleResetRight = () => {
     if (isStarted) return;
     setRightLayer(1);
     setRightSlot(1);
-    setConfigSentToPLC(false);   
+    setConfigSentToPLC(false);
+    pushLog("Reset RIGHT ejecutado");
   };
 
   const handleChangeLeftEnabled = (value: boolean) => {
-  setLeftEnabled(value);
-  setConfigSentToPLC(false);
-};
+    setLeftEnabled(value);
+    setConfigSentToPLC(false);
+  };
 
-const handleChangeRightEnabled = (value: boolean) => {
-  setRightEnabled(value);
-  setConfigSentToPLC(false);
-};
+  const handleChangeRightEnabled = (value: boolean) => {
+    setRightEnabled(value);
+    setConfigSentToPLC(false);
+  };
 
-const handleChangeLeftLayer = (value: number) => {
-  setLeftLayer(value);
-  setConfigSentToPLC(false);
-};
+  const handleChangeLeftLayer = (value: number) => {
+    setLeftLayer(value);
+    setConfigSentToPLC(false);
+  };
 
-const handleChangeLeftSlot = (value: number) => {
-  setLeftSlot(value);
-  setConfigSentToPLC(false);
-};
+  const handleChangeLeftSlot = (value: number) => {
+    setLeftSlot(value);
+    setConfigSentToPLC(false);
+  };
 
-const handleChangeRightLayer = (value: number) => {
-  setRightLayer(value);
-  setConfigSentToPLC(false);
-};
+  const handleChangeRightLayer = (value: number) => {
+    setRightLayer(value);
+    setConfigSentToPLC(false);
+  };
 
-const handleChangeRightSlot = (value: number) => {
-  setRightSlot(value);
-  setConfigSentToPLC(false);
-};
-
+  const handleChangeRightSlot = (value: number) => {
+    setRightSlot(value);
+    setConfigSentToPLC(false);
+  };
 
   // ============================
   // SET CONFIG → ESCRIBIR A PLC
@@ -321,6 +350,9 @@ const handleChangeRightSlot = (value: number) => {
     if (!industrialEthernet) {
       console.error(
         "[HMI] No hay instancia de industrialEthernet, no puedo escribir GPR."
+      );
+      pushLog(
+        "ERROR: industrialEthernet no disponible, no se envió config al PLC"
       );
       return;
     }
@@ -337,6 +369,7 @@ const handleChangeRightSlot = (value: number) => {
 
     if (sideCode < 0) {
       console.warn("SET CONFIG → Config inválida (sideCode < 0)");
+      pushLog("WARN: intento de SET CONFIG con configuración inválida");
       return;
     }
 
@@ -353,6 +386,10 @@ const handleChangeRightSlot = (value: number) => {
       rightLayer,
       rightSlot,
     });
+
+    pushLog(
+      `SET CONFIG → side=${sideCode}, L[en=${leftEnabledInt}, layer=${leftLayer}, slot=${leftSlot}], R[en=${rightEnabledInt}, layer=${rightLayer}, slot=${rightSlot}]`
+    );
 
     try {
       // BITs
@@ -401,8 +438,13 @@ const handleChangeRightSlot = (value: number) => {
         results
       );
       setConfigSentToPLC(true);
+      pushLog("CONFIG enviada correctamente al PLC");
     } catch (err) {
-      console.error("Error al mandar config al PLC vía IndustrialEthernet:", err);
+      console.error(
+        "Error al mandar config al PLC vía IndustrialEthernet:",
+        err
+      );
+      pushLog(`ERROR al mandar config al PLC: ${String(err)}`);
       setConfigSentToPLC(false);
     }
   };
@@ -438,10 +480,12 @@ const handleChangeRightSlot = (value: number) => {
         onSetConfig={handleSetConfigToPLC}
         isSetDisabled={isSetConfigDisabled}
         lockInputs={configSentToPLC}
-
       />
+
       <div className={styles.controlCard}>
-        <div className={styles.controlCardHeader}>Palletizing control</div>
+        <div className={styles.controlCardHeader}>
+          Palletizing control
+        </div>
         <div className={styles.controlCardBody}>
           <ControlButtons
             onStart={handleStart}
@@ -455,6 +499,24 @@ const handleChangeRightSlot = (value: number) => {
             isStopDisabled={isStopDisabled}
             isGoHomeDisabled={isGoHomeDisabled}
           />
+        </div>
+      </div>
+
+      {/* LOG PANEL */}
+      <div className={styles.logCardWrapper}>
+        <div className={styles.logCard}>
+          <div className={styles.logCardHeader}>Event log</div>
+          <div className={styles.logCardBody}>
+            {logs.length === 0 ? (
+              <div className={styles.logEmpty}>No events yet.</div>
+            ) : (
+              <ul className={styles.logList}>
+                {logs.map((line, idx) => (
+                  <li key={idx}>{line}</li>
+                ))}
+              </ul>
+            )}
+          </div>
         </div>
       </div>
     </div>

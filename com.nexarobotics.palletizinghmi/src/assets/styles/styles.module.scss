@@ -1,3 +1,7 @@
+/* =====================================================
+   LAYOUT GENERAL DEL MÓDULO
+   ===================================================== */
+
 .mainContainer {
   padding: 20px;
   display: flex;
@@ -5,18 +9,21 @@
   gap: 16px;
 }
 
-/* =======================
-   BOTONES DE CONTROL
-   ======================= */
+/* =====================================================
+   BOTONES DE CONTROL (START / PAUSE / STOP / GO HOME)
+   ===================================================== */
+
+/* Contenedor principal de botones de control */
 .controlButtonsContainer {
   display: flex;
-  justify-content: center;   
-  align-items: center;       
-  gap: 20px;                 
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
   margin-top: 10px;
-  flex-wrap: nowrap;      
+  flex-wrap: nowrap;
 }
 
+/* Fila de botones (permite wrap si hiciera falta) */
 .controlsRow {
   display: flex;
   justify-content: center;
@@ -25,6 +32,7 @@
   padding: 16px 0;
 }
 
+/* Estilo base para todos los botones redondos */
 .btn {
   position: relative;
   min-width: 150px;
@@ -46,27 +54,23 @@
     opacity 0.12s ease;
 }
 
-/* START*/
+/* Estados de color por función */
 .btnStart {
-  background: #0B6E4F;
+  background: #0b6e4f;
 }
 
-/* PAUSE*/
 .btnPause {
   background: #f8b601;
 }
 
-/* CONTINUE*/
 .btnContinue {
   background: #0f9215;
 }
 
-/* STOP*/
 .btnStop {
-  background: #C62828;
+  background: #c62828;
 }
 
-/* GO HOME*/
 .btnGoHome {
   background: #152aa1;
 }
@@ -79,7 +83,7 @@
   box-shadow: none;
 }
 
-/* Hover y active (solo cuando no están deshabilitados) */
+/* Hover / active solo cuando NO están deshabilitados */
 .btn:not(:disabled):hover {
   transform: translateY(-1px);
   box-shadow: 0 12px 22px rgba(10, 32, 115, 0.25);
@@ -90,10 +94,9 @@
   box-shadow: 0 7px 14px rgba(10, 32, 115, 0.18);
 }
 
-
-/* =======================
-   TOGGLE SWITCH
-   ======================= */
+/* =====================================================
+   TOGGLE SWITCH (Selector de lado habilitado)
+   ===================================================== */
 
 .toggleContainer {
   display: flex;
@@ -108,6 +111,7 @@
   width: 80px;
 }
 
+/* Track del switch */
 .toggleSwitch {
   width: 50px;
   height: 26px;
@@ -117,10 +121,11 @@
   transition: background-color 0.25s ease;
 }
 
+/* Círculo interno que se desplaza */
 .toggleCircle {
   width: 22px;
   height: 22px;
-  background: white;
+  background: #ffffff;
   border-radius: 50%;
   position: absolute;
   top: 2px;
@@ -128,17 +133,17 @@
   transition: left 0.25s ease, box-shadow 0.25s ease;
 }
 
-/* ON */
+/* Estado ON */
 .on {
   background-color: #4caf50;
 }
 
 .on .toggleCircle {
   left: 26px;
-  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
 }
 
-/* OFF */
+/* Estado OFF */
 .off {
   background-color: #aaaaaa;
 }
@@ -148,7 +153,7 @@
   box-shadow: none;
 }
 
-/* Toggle disabled */
+/* Switch deshabilitado (por lógica de la HMI) */
 .toggleContainerDisabled {
   opacity: 0.6;
 }
@@ -157,10 +162,9 @@
   cursor: not-allowed;
 }
 
-
-/* =======================
-   CARDS (Pallet + Control)
-   ======================= */
+/* =====================================================
+   CARDS PRINCIPALES (Pallet state + Palletizing control)
+   ===================================================== */
 
 .palletCard,
 .controlCard {
@@ -170,6 +174,7 @@
   min-width: 480px;
 }
 
+/* Encabezados de las tarjetas */
 .palletCardHeader,
 .controlCardHeader {
   background: #16205c;
@@ -180,25 +185,32 @@
   padding: 10px 16px;
 }
 
+/* Cuerpo de la tarjeta de pallets (dos lados) */
 .palletCardBody {
   display: flex;
   flex-direction: row;
   gap: 24px;
   padding: 20px 24px;
   align-items: flex-start;
-  flex-wrap: nowrap;   
+  flex-wrap: nowrap;
 }
 
+/* Cuerpo de la tarjeta de control (solo botones) */
 .controlCardBody {
   padding: 20px 24px;
 }
 
+/* =====================================================
+   SECCIONES IZQUIERDA / DERECHA DEL PALLET
+   ===================================================== */
+
 .palletSide {
   flex: 1;
   padding: 0 8px;
-  min-width: 260px;    
+  min-width: 260px;
 }
 
+/* Línea divisora vertical entre lados */
 .palletDivider {
   width: 1px;
   background: #dddddd;
@@ -206,6 +218,7 @@
   margin: 0 4px;
 }
 
+/* Encabezado de cada lado (Left pallet / Right pallet + switch) */
 .palletSideHeader {
   display: flex;
   align-items: center;
@@ -218,6 +231,7 @@
   font-weight: 600;
 }
 
+/* Mensajes de estado de pallet (banners pequeños) */
 .palletStatusMissing {
   font-size: 12px;
   background: #ffd6d6;
@@ -238,6 +252,10 @@
   text-align: center;
   font-weight: 600;
 }
+
+/* =====================================================
+   CAMPOS DE LAYER / SLOT
+   ===================================================== */
 
 .palletFieldRow {
   display: flex;
@@ -264,6 +282,7 @@
   color: #666666;
 }
 
+/* Botón de reset de cada lado */
 .palletResetBtn {
   margin-top: 10px;
   width: 100%;
@@ -283,11 +302,15 @@
   background: #f3f3f3;
 }
 
-/* Botón Reset disabled */
+/* Reset deshabilitado cuando el robot está en marcha */
 .palletResetBtn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+/* =====================================================
+   BARRA GRANDE DE ESTADO DEL PALLET (Pill)
+   ===================================================== */
 
 .palletStatePill {
   width: 100%;
@@ -297,7 +320,7 @@
   font-size: 16px;
   font-weight: 600;
   margin: 8px 0 14px 0;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.12);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
   transition: all 0.2s ease;
 }
 
@@ -310,15 +333,18 @@
 /* Verde – pallet detected */
 .palletStateOn {
   background: #16a34a;
-  color: white;
+  color: #ffffff;
 }
 
+/* Footer de la tarjeta de pallets (botón Set config to PLC) */
 .palletCardFooter {
   padding: 8px 16px 14px 16px;
   border-top: 1px solid rgba(0, 0, 0, 0.06);
   display: flex;
   justify-content: center;
 }
+
+/* Botón central "Set config to PLC" */
 .palletSetBtn {
   padding: 18px 20px;
   border-radius: 20px;
@@ -341,3 +367,61 @@
 .palletSetBtn:hover:not(:disabled) {
   background: #1f2b80;
 }
+
+/* =====================================================
+   PANEL DE LOG (Event log)
+   ===================================================== */
+
+/* Tarjeta general de log */
+.logCard {
+  margin-top: 16px;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.04);
+  padding: 16px 24px;
+}
+
+/* Encabezado "Event log" */
+.logCardHeader {
+  font-weight: 600;
+  font-size: 16px;
+  margin-bottom: 8px;
+  color: #001f4d;
+}
+
+/* Cuerpo con scroll vertical */
+.logCardBody {
+  max-height: 160px;
+  overflow-y: auto;
+  background: #f7f9fc;
+  border-radius: 12px;
+  padding: 8px 12px;
+  font-family: "Roboto Mono", monospace;
+  font-size: 12px;
+}
+
+/* Estado vacío cuando no hay eventos */
+.logEmpty {
+  color: #888888;
+  font-style: italic;
+}
+
+/* Lista de líneas de log */
+.logList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.logList li {
+  padding: 2px 0;
+  white-space: pre-wrap;
+}
+
+/* Fondo de sección para resaltar el panel de log */
+.logCardWrapper {
+  background: #eef1f7;        /* Gris claro suave */
+  padding: 20px 24px;
+  border-radius: 16px;
+}
+
